@@ -45,19 +45,19 @@ router.post('/', async (req,res) =>{
 
 //EDIT A USER BY ID
 router.patch('/:id', async (req, res) => {
-    let user = User.findById(req.params.id)
-    console.log(user)
-    
-    if(req.body.firstName !== null){
-        user.firstName === req.body.firstName
+    let user = await User.findById(req.params.id)
+    if(user === null){
+        return res.status(404).json({message: 'cannot find user'})
     }
-    if(req.body.lastName !== null){
-        user.lastName === req.body.lastName 
+    if(req.body.firstName != null){
+        user.firstName = req.body.firstName
     }
-    if(req.body.age !== null){
-        user.age === req.body.age
+    if(req.body.lastName != null){
+        user.lastName = req.body.lastName 
     }
-
+    if(req.body.age != null){
+        user.age = req.body.age
+    }
     try{
         const updatedUser = await user.save()
         res.json(updatedUser)
@@ -67,4 +67,17 @@ router.patch('/:id', async (req, res) => {
 } )
 
 //REMOVE A USER BY ID
+router.delete('/:id', async (req,res) => {
+    const user = User.findById(req.params.id)
+    if(user === null){
+        return res.status(404).json({message: 'cannot find user'})
+    }
+    try{
+        await User.deleteOne(user)
+        res.json({message: 'deleted user successfully'})
+    }catch (err){
+        res.status(500).json({message: err.message})
+    }
+})
+
 module.exports = router
